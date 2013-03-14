@@ -4,46 +4,109 @@
 <script src="Sprite.js"></script>
 <script>
 window.onload=function(){
+
+	function Environment(map){
+		var obj=[]
+		return {
+			check:function(p){
+			for(var i=0;i<obj.length;i++){   //should fix the true and false
+				if(obj[i].collide(p)) return false;
+			}
+			return map.check(p);
+			//return true;
+			},
+			surround:function(p,d){
+				var objs=[]
+				for(var i=0;i<obj.length;i++){
+					if(obj[i].dist(p)==d) objs.push(obj[i])
+				}
+				return objs;
+			},
+			add:function(o){
+				map.add(o);
+				obj.push(o);
+			}}
+	}
+
+
 	var make_sprite=Sprite(32,8,26,"fantasy-tileset.png");
 	var map=Map(
 		make_sprite,[
-		0,0,0,0,0,0,0,0,
-		0,0,0,0,0,0,0,0,
-		0,0,0,1,0,1,0,0,
-		0,0,0,1,0,1,0,0,
-		0,1,1,1,0,1,0,0,
-		0,0,0,0,0,1,1,1,
-		0,0,0,0,0,0,0,0, 
-		0,0,0,0,0,0,0,0,
-	],8,{
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	],18,{
 		"0":{tile:30,walkable:true},
 		"1":{tile:24,walkable:false},
 	},document.getElementById("map"));
 
+	var env=Environment(map);
+
 	var dir=[[1,0],[-1,0],[0,-1],[0,1]];
-	function make_enemy(n,x,y){
-		var sprite=make_sprite(n,x,y)
+
+
+	var enemies=[
+		{tile:179,hp:50,atk:5,type:"orc"},
+		{tile:180,hp:60,atk:4,type:"cyclops"}
+	]
+	function make_enemy(n,x,y,delay){
+		var hp=enemies[n].hp,
+		attack=enemies[n].atk
+
+		var sprite=make_sprite(enemies[n].tile,x,y)
+		sprite.type=enemies[n].type;
 		function move(){
-			sprite.move(dir[~~(Math.random()*4)],map.check)
-			setTimeout(move,100)
+			sprite.move(dir[~~(Math.random()*4)],env.check)
+			setTimeout(move,delay)
+		}
+		sprite.damage=function(d){
+
 		}
 		move()
 		return sprite;
 	}
 
-	var pc=make_sprite([147],2,3);
-	var enemy=make_enemy(179,4,4);
-	var enemy2=make_enemy(179,2,2);
 	
+	
+
+
+
+
+	/*
+	var pc=make_sprite([147],2,3);
 	document.body.onkeydown=function(e){
-		if(e.keyCode==39) pc.move([1,0],map.check)
-		if(e.keyCode==37) pc.move([-1,0],map.check)
-		if(e.keyCode==38) pc.move([0,-1],map.check)
-		if(e.keyCode==40) pc.move([0,1],map.check)
+		if(e.keyCode==39) pc.move([1,0],move_check)
+		if(e.keyCode==37) pc.move([-1,0],move_check)
+		if(e.keyCode==38) pc.move([0,-1],move_check)
+		if(e.keyCode==40) pc.move([0,1],move_check)
 	}
-	map.appendChild(pc)
-	map.appendChild(enemy)
-	map.appendChild(enemy2)
+	map.add(pc)
+	*/
+
+
+	for(var i=0;i<20;i++){
+		var x=~~(Math.random()*18),y=~~(Math.random()*10);
+		while(!env.check([x,y])){
+			x=~~(Math.random()*18)
+			y=~~(Math.random()*10);
+		}
+		env.add(make_enemy(~~(Math.random()*2),x,y,~~(Math.random()*200)))
+	}
 }
 </script>
 <style>
